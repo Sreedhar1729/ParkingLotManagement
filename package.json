@@ -9,12 +9,15 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
-    "@sap/cds": "^7",
-    "express": "^4"
+    "@sap/cds": "^7.9.2",
+    "@sap/cds-hana": "^2",
+    "add": "^2.0.6",
+    "express": "^4",
+    "passport": "^0.7.0"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^1",
-    "@sap/cds-dk": "^7",
+    "@sap/cds-dk": "^7.9.4",
     "@sap/eslint-plugin-cds": "^3",
     "eslint": "^9"
   },
@@ -23,5 +26,10 @@
   },
   "main": "eslint.config.js",
   "keywords": [],
-  "author": ""
+  "author": "",
+  "cds": {
+    "requires": {
+      "db": "sqlite"
+    }
+  }
 }

@@ -3,91 +3,91 @@ ID: parkinglot
 description: A simple CAP project.
 version: 1.0.0
 modules:
-- name: parkinglot-srv
-  type: nodejs
-  path: gen/srv
-  requires:
-  - name: parkinglot-db
-  provides:
-  - name: srv-api
-    properties:
-      srv-url: ${default-url}
-  parameters:
-    buildpack: nodejs_buildpack
-    readiness-health-check-http-endpoint: /health
-    readiness-health-check-type: http
-  build-parameters:
-    builder: npm
-- name: parkinglot-db-deployer
-  type: hdb
-  path: gen/db
-  requires:
-  - name: parkinglot-db
-  parameters:
-    buildpack: nodejs_buildpack
-- name: parkinglot-destination-content
-  type: com.sap.application.content
-  requires:
-  - name: parkinglot-destination-service
+  - name: parkinglot-srv
+    type: nodejs
+    path: gen/srv
+    requires:
+      - name: parkinglot-db
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
     parameters:
-      content-target: true
-  - name: parkinglot_html_repo_host
+      buildpack: nodejs_buildpack
+      readiness-health-check-http-endpoint: /health
+      readiness-health-check-type: http
+    build-parameters:
+      builder: npm
+  - name: parkinglot-db-deployer
+    type: hdb
+    path: gen/db
+    requires:
+      - name: parkinglot-db
     parameters:
-      service-key:
-        name: parkinglot_html_repo_host-key
-  - name: uaa_parkinglot
+      buildpack: nodejs_buildpack
+  - name: parkinglot-destination-content
+    type: com.sap.application.content
+    requires:
+      - name: parkinglot-destination-service
+        parameters:
+          content-target: true
+      - name: parkinglot_html_repo_host
+        parameters:
+          service-key:
+            name: parkinglot_html_repo_host-key
+      - name: uaa_parkinglot
+        parameters:
+          service-key:
+            name: uaa_parkinglot-key
     parameters:
-      service-key:
-        name: uaa_parkinglot-key
-  parameters:
-    content:
-      instance:
-        destinations:
-        - Name: parkinglotapprouter_parkinglot_html_repo_host
-          ServiceInstanceName: parkinglot-html5-app-host-service
-          ServiceKeyName: parkinglot_html_repo_host-key
-          sap.cloud.service: parkinglotapprouter
-        - Authentication: OAuth2UserTokenExchange
-          Name: parkinglotapprouter_uaa_parkinglot
-          ServiceInstanceName: parkinglot-xsuaa-service
-          ServiceKeyName: uaa_parkinglot-key
-          sap.cloud.service: parkinglotapprouter
-        existing_destinations_policy: ignore
-  build-parameters:
-    no-source: true
+      content:
+        instance:
+          destinations:
+            - Name: parkinglotapprouter_parkinglot_html_repo_host
+              ServiceInstanceName: parkinglot-html5-app-host-service
+              ServiceKeyName: parkinglot_html_repo_host-key
+              sap.cloud.service: parkinglotapprouter
+            - Authentication: OAuth2UserTokenExchange
+              Name: parkinglotapprouter_uaa_parkinglot
+              ServiceInstanceName: parkinglot-xsuaa-service
+              ServiceKeyName: uaa_parkinglot-key
+              sap.cloud.service: parkinglotapprouter
+          existing_destinations_policy: ignore
+    build-parameters:
+      no-source: true
 resources:
-- name: parkinglot-db
-  type: com.sap.xs.hdi-container
-  parameters:
-    service: hana
-    service-plan: hdi-shared
-- name: parkinglot-destination-service
-  type: org.cloudfoundry.managed-service
-  parameters:
-    config:
-      HTML5Runtime_enabled: true
-      version: 1.0.0
-    service: destination
-    service-name: parkinglot-destination-service
-    service-plan: lite
-- name: parkinglot_html_repo_host
-  type: org.cloudfoundry.managed-service
-  parameters:
-    service: html5-apps-repo
-    service-name: parkinglot-html5-app-host-service
-    service-plan: app-host
-- name: uaa_parkinglot
-  type: org.cloudfoundry.managed-service
-  parameters:
-    path: ./xs-security.json
-    service: xsuaa
-    service-name: parkinglot-xsuaa-service
-    service-plan: application
+  - name: parkinglot-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+  - name: parkinglot-destination-service
+    type: org.cloudfoundry.managed-service
+    parameters:
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+      service: destination
+      service-name: parkinglot-destination-service
+      service-plan: lite
+  - name: parkinglot_html_repo_host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-name: parkinglot-html5-app-host-service
+      service-plan: app-host
+  - name: uaa_parkinglot
+    type: org.cloudfoundry.managed-service
+    parameters:
+      path: ./xs-security.json
+      service: xsuaa
+      service-name: parkinglot-xsuaa-service
+      service-plan: application
 parameters:
   enable-parallel-deployments: true
 build-parameters:
   before-all:
-  - builder: custom
-    commands:
-    - npm ci
-    - npx cds build --production
+    - builder: custom
+      commands:
+        - npm ci
+        - npx cds build --production
